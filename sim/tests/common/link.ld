@@ -17,8 +17,8 @@ CL_SIZE = 32;
 
 SECTIONS {
 
-  /* code segment */
-  .text.init 0 : { 
+  /* code segment*/
+  .text.sim 0 : { 
     FILL(0);
     . = 0x100 - 12;
     SIM_EXIT = .;
@@ -26,9 +26,17 @@ SECTIONS {
     SIM_STOP = .;
     LONG(0x6F);
     LONG(-1);
-    . = 0x100;
+  } >RAM
+
+  /* code segment - Trap Vector at 0x6c0 */
+  .text.init 0x6c0 : { 
+    *(.text.init)
+  } >RAM
+
+  /* code segment - Reset Vector (Start) at 0x800 */
+  .text.start 0x800 : {
     PROVIDE(__TEXT_START__ = .);
-    *(.text.init) 
+    *(.text.start)
   } >RAM
 
   .text  : {

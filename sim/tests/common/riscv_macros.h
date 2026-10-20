@@ -103,7 +103,6 @@
 
 #define RVTEST_CODE_BEGIN                                               \
         .section .text.init;                                            \
-        .org 0xC0, 0x00;                                                \
         .balign  64;                                                    \
         .weak stvec_handler;                                            \
         .weak mtvec_handler;                                            \
@@ -132,6 +131,7 @@ other_exception:                                                        \
 _report:                                                                \
         j sc_exit;                                                      \
         .balign  64;                                                    \
+	.section .text.start;                                           \
         .globl _start;                                                  \
 _start:                                                                 \
         RISCV_MULTICORE_DISABLE;                                        \
@@ -197,6 +197,9 @@ _run_test:
 
 #define RVTEST_DATA_BEGIN                                                       \
         EXTRA_DATA                                                              \
+        .section .data;                                                         \
+        .globl msg_breakpoint;                                                  \
+msg_breakpoint: .string "Breakpoint detected!\n";                               \
         .pushsection .tohost,"aw",@progbits;                                    \
         .balign 64; .global tohost; tohost: .dword 0;                           \
         .balign 64; .global fromhost; fromhost: .dword 0;                       \
