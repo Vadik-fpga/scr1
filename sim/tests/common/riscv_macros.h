@@ -107,6 +107,17 @@
         .weak stvec_handler;                                            \
         .weak mtvec_handler;                                            \
 trap_vector:                                                            \
+        csrr a4, mcause;                                                \
+        li a5, CAUSE_BREAKPOINT;                                        \
+        bne a4, a5, 5f; /* Если это не Breakpoint, идем дальше */       \
+        la a0, msg_breakpoint;                                          \
+4:      lbu a1, 0(a0);                                                  \
+        beqz a1, 5f;                                                    \
+        li a2, 0xF0000000; /* Адрес для вывода в консоль */             \
+        sb a1, 0(a2);                                                   \
+        addi a0, a0, 1;                                                 \
+        j 4b;                                                           \
+5:                                                                      \
         /* test whether the test came from pass/fail */                 \
         csrr a4, mcause;                                                \
         li a5, CAUSE_USER_ECALL;                                        \
@@ -199,7 +210,7 @@ _run_test:
         EXTRA_DATA                                                              \
         .section .data;                                                         \
         .globl msg_breakpoint;                                                  \
-msg_breakpoint: .string "Breakpoint detected!\n";                               \
+msg_breakpoint: .string "Yadro\n";                                              \
         .pushsection .tohost,"aw",@progbits;                                    \
         .balign 64; .global tohost; tohost: .dword 0;                           \
         .balign 64; .global fromhost; fromhost: .dword 0;                       \
